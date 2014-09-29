@@ -1,4 +1,4 @@
-sharea
+sharea.net
 ======
 
 social sharing website file (old version)
