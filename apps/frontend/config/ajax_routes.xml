@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<routes>
+	<route url="/ajax/genqrcode/([0-9]+)" module="qrcode" action="index" vars="file"/>
+	
+	<!-- Files -->
+	<route url="/ajax/getfileinfos/([0-9]+)" module="file" action="getFileInfos" vars="file"/>
+	<route url="/ajax/upload" module="file" action="upload"/>
+	<route url="/ajax/file/remove" module="file" action="remove"/>
+	<route url="/ajax/file/import" module="file" action="import"/>
+	<route url="/ajax/file/permissions/edit" module="file" action="chgPerm"/>
+	<route url="/ajax/file/rename" module="file" action="rename"/>
+	<route url="/ajax/file/search" module="file" action="search" />
+	<route url="/ajax/file/getfiles" module="file" action="getAll"/>
+	<route url="/ajax/folder/getfolders" module="folder" action="getAll"/>
+	
+	<!-- Friends -->
+	<route url="/ajax/friends/getfriends" module="friends" action="getAll"/>
+	<route url="/ajax/friends/delete" module="friends" action="delete"/>
+
+	<!-- Notifications -->
+	<route url="/ajax/notifications/get" module="notification" action="getNotifications"/>
+	<route url="/ajax/notifications/create" module="test" action="createNotif"/>
+	<route url="/ajax/notifications/seen" module="notification" action="seen"/>
+	
+	<!-- Folders -->
+	<route url="/ajax/folder/remove" module="folder" action="remove"/>
+	<route url="/ajax/folder/permissions/edit" module="folder" action="chgPerm"/>
+	<route url="/ajax/folder/rename" module="folder" action="rename"/>
+	<route url="/ajax/folder/search" module="folder" action="search"/>
+    	<route url="/ajax/folder/create" module="folder" action="create" />
+	
+	<!-- Widgets -->
+	<route url="/ajax/widget/memo/get" module="widget" action="getmemo" />	
+	<route url="/ajax/widget/memo/save" module="widget" action="savememo" />
+</routes>

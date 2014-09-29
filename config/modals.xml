@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<modals>
+	<modal name="share" uri="sharefile.php" id="1"/>
+	<modal name="links" id="2"/>
+	<modal name="delete" id="3"/>
+</modals>

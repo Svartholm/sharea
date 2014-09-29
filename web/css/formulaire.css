@@ -1,0 +1,27 @@
+#name_hidden { 
+	color:red;
+	display: none;
+	float:right;
+	margin-top:3px;
+}
+
+#firstname_hidden { 
+	color:red;
+	display: none;
+	float:right;
+	margin-top:3px;
+}
+
+#pseudo_hidden { 
+	color:red;
+	display: none;
+	float:right;
+	margin-top:3px;
+}
+
+#email_hidden {
+	color:red;
+	display: none;
+	float:right;
+	margin-top:3px;
+}

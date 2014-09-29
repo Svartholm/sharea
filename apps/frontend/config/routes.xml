@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<routes>
+	<route url="/" module="index" action="index"/>
+	
+	<!-- Folders & files -->
+	<!-- Redirect to /files/ if trying to go to /files -->
+	<route url="/files" module="folder" action="redirect_root"/>
+	<!-- POSIX 26*2, 10, ".", "_" , "-", "/" -->
+	<route url="/files(/[0-9+]*)" module="folder" action="showFolder" vars="id"/>
+
+	<!-- Shared Folders Display -->
+	<route url="/users/([a-z0-9._-]{3,15})/files(/[0-9+]*)" module="share" action="display" vars="pseudo,id"/>
+
+	<!-- File upload -->
+	<route url="/upload" module="file" action="upload"/> 
+	<route url="/drag" module="file" action="drag"/>
+	<route url="/fileremove" module="file" action="remove"/>
+	<route url="/renamefile" module="file" action="rename"/>
+	<route url="/movefile" module="file" action="move"/>
+	<route url="/sharefile" module="file" action="share"/>
+	<route url="/download/([0-9]+)(/min)?.*" module="file" action="download" vars="file,min"/>
+	<route url="/qrcode/([0-9]+)" module="qrcode" action="index" vars="file"/>
+	
+	<!-- Users -->
+	<route url="/signin" module="user" action="create"/>
+	<route url="/login" module="user" action="auth"/>
+	<route url="/facebook.*" module="user" action="facebook"/>
+	<route url="/logout" module="user" action="logout"/>
+	<route url="/users/([a-z0-9._-]{3,15})" module="user" action="profile" vars="pseudo"/>
+	<route url="/forgot" module="user" action="forgot"/>
+	<route url="/forgot(/[a-z0-9]{64})" module="user" action="resetpwd" vars="key"/>
+	
+	<!-- Friends -->
+	<route url="/friends" module="friends" action="index" />
+	<route url="/friends/search" module="friends" action="search" />
+	<route url="/friends/accept/([0-9]+)" module="friends" action="accept" vars="friendid" />
+	<route url="/friends/invite/([0-9]+)" module="friends" action="invite" vars="userid" />
+	<route url="/friends/decline/([0-9]+)" module="friends" action="decline" vars="userid" />
+	
+	<!-- No JavaScript -->
+	<route url="/nojs" module="nojs" action="index"/>
+</routes>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<vars>
+	<var name="api" value="pdo"/>
+	<var name="dbms" value="mysql"/>
+	<var name="host" value="localhost"/>
+	<var name="login" value="root"/>
+	<var name="password" value=""/>
+	<var name="dbname" value="sharea"/>
+</vars>

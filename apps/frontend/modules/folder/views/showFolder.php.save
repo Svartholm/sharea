@@ -1,0 +1,444 @@
+<script type="text/javascript" src="/js/bootstrap-twipsy.js"></script>
+<script type="text/javascript" src="/js/bootstrap-modal.js"></script>
+<script type="text/javascript" src="/js/bootstrap-tooltip.js"></script>
+<script type="text/javascript" src="/js/bootstrap-popover.js"></script>
+
+<script type="text/javascript">function dispForm() { obj = document.getElementById('invisible'); if(obj.style.display == 'none') obj.style.display = 'block'; else obj.style.display = 'none'; }</script> 
+<script type="text/javascript">function dispYT() { obj = document.getElementById('YTinvisible'); if(obj.style.display == 'none') obj.style.display = 'block'; else obj.style.display = 'none'; }</script>      
+<script type="text/javascript">function dispLoad() { obj = document.getElementById('avancement'); if(obj.style.display == 'none') obj.style.display = ''; else obj.style.display = 'none'; }</script>
+
+<div id="showfiles" class="container">
+	<!-- PARTIE UPLOAD !-->
+	<div id="up" class="container">
+		<!-- Colonne de gauche avec D&D et input -->
+		<h3 id="filestitle">Transférez vos fichiers en ligne</h3>
+		<div class="span6">
+			<form id="formfile" action="#">
+				<div class="control-group">
+					<label id="label" class="control-label" for="file"><span class="label label-info">Note</span>&nbsp;Choisissez le(s) fichier(s) à  envoyer puis cliquez sur le bouton "Envoyer"</label><br />
+						<div class="controls">
+							<input type="file" id="fileselect[]" name="file" multiple="multiple"><br/>
+							<div id="filedrag">Glissez vos fichiers ici !</div>
+							<input type="hidden" value="<?php echo $current_folder_id; ?>" name="parent" id="parent"/>
+							<input id="submit_ie" type="submit" class="btn btn-primary" value="Envoyer le fichier"/>
+						</div>
+				</div>
+			</form>
+			<div id="pre_upload">
+				<table class="table table-striped">
+					<thead id="head_table">
+					<h4 id="p_send">Appuyez sur "Envoyer les fichiers" pour envoyer ces documents</h4>
+						<tr>
+							<th>#</th>
+							<th>Nom du fichier</th>
+							<th>Taille</th>
+						</tr>
+					</thead>
+					<tbody id="body_table">
+					</tbody>
+				</table>
+			</div><br />
+			<button id="remove_list" class="btn btn-danger" name="submit"/>Vider la liste</button>
+		</div>
+		
+		<!-- Colonne de droite avec infos du fichier -->
+		<div id="span_right" class="span5">
+	     	<p>
+			<strong>Nom du fichier</strong> : <span id="fileName"><em>Aucun fichier chargé</em></span> <span id="nbr"></span><br />
+			<div id="bardiv" class="progress progress-striped active">
+		      	<div id="progress" class="bar" style="width: 0%;"></div>
+			</div>
+			<span id="percent_upload"></span><span id="current"></span><span id="total"></span>
+	     	</p>
+	     	<button id="submitbutton" class="btn btn-primary" name="submit"/>Envoyer les fichiers</button>
+		</div>
+	</div>
+
+
+	<?php
+	if(isset($notification))
+	{
+		echo "<div class=\"alert alert-success\" id=\"notifok\">
+			   <a class=\"close\" href=\"".$_SERVER['REDIRECT_URL']."\">&times;</a>
+        		".$notification."
+     			</div>";
+	}
+	echo '<ul class="breadcrumb">';
+		foreach($breadcrumb as $bread_folder)
+			{
+				echo '<li><a href="/files'.$bread_folder['path'].'">'.$bread_folder['name'].'</a> <span class="divider"><i class="icon-chevron-right"></i></span></li>';
+			}
+		echo '<li class="active">'.$current_folder_name.'</li></ul>';
+	?>
+
+	<div><a onclick="dispForm()" href="#">Créer un dossier</a>
+		<div id="invisible">
+			<form action="<?php echo $_SERVER['REDIRECT_URL']; ?>" method="POST" name="create_folder">
+				Nom du nouveau dossier : <input type="text" name="folder_name"/>
+				<input type="hidden" name="parent" value="<?php echo $current_folder_id; ?>"/>
+				<input type="hidden" name="action" value="addFolder"/>
+				<input class="btn btn-primary" type="submit" name="submit" value="Créer le dossier"/>
+			</form>
+		</div>
+	</div>
+	<hr/>
+
+	<?php
+	if(isset($parent_id)) // si on est pas dans le dossier root, on affiche l'icone retour (dossier parent)
+		{ 
+		?>
+		<div>
+			<div class="dossier">
+				<a href="/files<?php echo '/'.$parent_id; ?>">
+				<img src="/images/folder_home.png" alt="home"><br />
+				<span>Retour</span></a>
+			</div>
+		</div>
+		<?php
+	}
+
+	require $modal_renameFolder;
+	require $modal_removeFolder;
+	require $modal_shareFolder;
+		
+	$count = 1;
+	foreach($folders as $folder)
+	{ 
+		$name = $folder->name();
+		$shortname = ToolBox::cut($folder->name(), 7, '...', true);
+		$mode = $folder->permissions()->mode();
+		if($mode == Permission::P_Private)
+			{
+				$permission = "Privé";
+			}
+		else if($mode == Permission::P_Public)
+			{
+				$permission = "Public";
+			}
+		else
+			{
+				$permission = "Amis uniquement";
+			}
+		?>   
+		<div>
+			<div class="dossier">
+			<?php $pcount = 0; ?>
+				<a href="/files<?php echo '/'.$folder->id(); ?>" id="name<?php echo $count; ?>" rel="popover" data-content="Nom : <b><?php echo htmlentities($name, ENT_QUOTES, 'UTF-8'); ?></b><br>Visible par : <b><?php echo $permission; ?></b><br />Date de création : <b><?php echo $folder->date(); ?></b>" title="Propriétés du dossier">
+				<?php if(strtolower($folder->name()) == "musique"){ ?>
+					<img src="/images/music.png" alt="musique">
+				<?php } else if(strtolower($folder->name()) == "photos"){ ?>
+					<img src="/images/pictures.png" alt="image">
+				<?php } else if($folder->name() == "Vidéos"){ ?>
+					<img src="/images/videos.png" alt="video">
+				<?php } else { ?>
+					<img src="/images/folder.png" alt="dossier"> <?php }?>
+						
+				<?php
+				// Cadenas si dossier privé					
+				if($mode == Permission::P_Private)
+					{
+						echo '<i class="icon-lock cadenas"></i>';				
+					}
+				?>
+				<br />
+				<span><?php echo $shortname ?></span></a><br />
+
+				<script>
+				$(document).ready(function() {
+				   $(function () {
+					$("#name<?php echo $count; ?>").popover({
+						html: true
+						})
+					})
+				});
+				</script>
+		
+				<div class="btn-group">
+					<a href="#" data-toggle="dropdown" class="btn btn-small dropdown-toggle options">Options <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="#" onclick="renommerdossier('<?php echo $folder->id(); ?>', '<?php echo htmlentities($name, ENT_QUOTES, 'UTF-8'); ?>')" data-controls-modal="renommerdossier" data-backdrop="static"><i class="icon-pencil"></i> Renommer</a></li>
+				  		<li><a href="#" onclick="partagerdossier('<?php echo $folder->id(); ?>', '<?php echo htmlentities($name, ENT_QUOTES, 'UTF-8'); ?>', '<?php echo $mode; ?>')" data-controls-modal="partagerdossier" data-backdrop="static"><i class="icon-share"></i> Partager</a></li>
+				  		<li class="divider"></li>
+				  		<li><a href="#" onclick="supprimerdossier('<?php echo $folder->id(); ?>', '<?php echo htmlentities($name, ENT_QUOTES, 'UTF-8'); ?>')" data-controls-modal="supprimerdossier" data-backdrop="static"><i class="icon-remove"></i> Supprimer</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<?php
+			$count++;
+		}
+		?>
+
+		</div>
+		
+		
+		<div id="fichiers" class="container">
+		<!--<a onclick="dispYT()" href = "#">Importer une vidéo depuis YouTube</a>
+		<div id="YTinvisible">
+			<form action="/ytdl" method="POST" name="yt_download">
+				Lien de la vidéo : <input type="text" name="video_url" placeholder="http://www.youtube.com/watch?v="/> <i class="icon-plus"></i><a href="/faq">&nbsp;Plus d'informations</a><br />
+				<input type="checkbox" name="mp3" value="true"> Convertir directement au format MP3
+				<input type="hidden" name="parent" value="<?php echo $current_folder_id; ?>"/>
+				<input class="btn btn-primary" type="submit" id="telecharger" value="Télécharger !" onclick="dispLoad()"/>
+				<img src="/images/avancement.gif" id="avancement" alt="avancement">
+			</form>
+		</div>-->
+		<hr />
+		
+		<div class="alert alert-info advice-file">
+			Ecoutez une musique, regardez vos photos ou une vidéo d'un <strong>simple clic sur l'icone</strong> correspondante !
+		</div>
+		<br />
+
+		<?php
+		foreach($files as $file) {
+			$type = explode('/', $file->mimetype());
+			if($type[0] == "image")
+				{
+					$p_files[] = $file;
+				}
+			}
+		
+		// AFFICHAGE DES FICHIERS
+		foreach($files as $file)
+		{
+			$name = $file->name();
+				$type = explode('/', $file->mimetype());
+				if($type[0] == "video" || ($type[0] == "application" && $type[1] == "ogg"))
+				{
+					require $modal_videoFile; 
+				}
+				else if($type[0] == "image")
+				{
+					$pcount++;
+				}
+			?>
+				<div class="fichier">
+					<?php
+					if($type[0] == "audio")
+					{
+					    echo "<a href=\"#\" onclick=\"lire(".$file->id().")\" data-backdrop=\"static\" ";
+					}
+					else if($type[0] == "video" || ($type[0] == "application" && $type[1] == "ogg"))
+					{
+						echo "<a href=\"#\" data-controls-modal=\"video".$count."\" data-backdrop=\"static\" ";
+					}
+					else if($type[0] == "image")
+					{
+						echo "<a href=\"#\" data-controls-modal=\"picture\" onclick=diapo(".$pcount.") data-backdrop=\"static\" ";
+					}
+					else
+					{
+						echo "<a href=\"/download/".$file->id()."\" ";
+					}
+					?>
+					id="name<?php echo $count; ?>" data-rel="popover" data-content="Nom : <b><?php echo htmlentities($name, ENT_QUOTES, 'UTF-8'); ?></b><br/>Visible par : <b>
+					<?php 
+					$mode = $file->permissions()->mode();
+					if($mode == Permission::P_Private)
+					{
+						echo "Moi uniquement";
+					}
+					else if($mode == Permission::P_Public)
+					{
+						echo "Tout le monde";
+					}
+					else
+					{
+						echo "Seulement mes amis";
+					}?>
+				</b><br />Taille : <b><?php echo number_format($file->size()/1024/1024, 2); ?> Mo</b><br/>Type : <b><?php echo $file->mimetype(); ?></b><br />Date d'envoi : <b><?php echo $file->date(); ?></b>" title="Propriétés du fichier">
+
+
+					<script>
+					$(document).ready(function() {
+						   $(function () {
+							$("#name<?php echo $count; ?>").popover({
+							html: true
+							    })
+
+						})
+					});
+					</script>
+
+					<?php 
+
+					if(substr($name, strlen($name) - 3) == "odp") {
+						echo "<img src=\"/images/mimetypes/diapo.png\" alt=\"diapo\">";
+					}
+
+					// si image
+					else if($type[0] == "image") {
+						if($type[1] == "jpg" || $type[1] == "jpeg" || $type[1] == "png" || $type[1] == "gif") {
+							echo "<img src=\"/download/".$file->id()."/min.".$type[1]."\" height=\"48\" class=\"icone-img\" alt=\"image\">";
+						}
+						else {
+							echo "<img src=\"/images/mimetypes/image.png\" alt=\"image\">";
+						}
+					}
+					
+					// si audio
+					else if($type[0] == "audio") {
+						echo "<img src=\"/images/mimetypes/audio.png\" alt=\"audio\">";
+					} 
+
+					// si video
+					else if($type[0] == "video" || ($type[0] == "application" && $type[1] == "ogg")) {
+						echo "<img src=\"/images/mimetypes/video.png\" alt=\"video\">";
+					} 
+
+					// si texte
+					else if($type[0] == "text") {
+						if($type[1] == "html" or $type[1] == "webviewhtml") {
+							echo "<img src=\"/images/mimetypes/www.png\" alt=\"www\">";
+						}
+						else {
+							echo "<img src=\"/images/mimetypes/brut.png\" alt=\"brut\">";
+						}
+					} 
+
+					// si application
+					else if($type[0] == "application") {
+						if($type[1] == "msword" or $type[1] == "vnd.ms-office") {
+							echo "<img src=\"/images/mimetypes/word.png\" alt=\"word\">";
+						}
+						else if($type[1] == "zip" || $type[1] == "x-gzip") {
+							echo "<img src=\"/images/mimetypes/zip.png\" alt=\"zip\">";
+						}
+						else if($type[1] == "octet-stream") {
+							echo "<img src=\"/images/mimetypes/executable.png\" alt=\"exe\">";
+						}
+						else if($type[1] == "pdf") {
+							echo "<img src=\"/images/mimetypes/word.png\" alt=\"pdf\">";
+						}
+						else if($type[1] == "vnd.ms-excel") {
+							echo "<img src=\"/images/mimetypes/tableur.png\" alt=\"tableur\">";
+						}
+						else {
+							echo "<img src=\"/images/mimetypes/brut.png\" alt=\"brut\">";	
+						}
+					} 
+
+					else {
+						echo "<img src=\"/images/mimetypes/brut.png\" alt=\"brut\">";
+					}
+
+
+					$shortname = ToolBox::cut($file->name(), 7, '...', true)
+					?>
+					<?php
+					// Cadenas si fichier privé					
+					if($mode == Permission::P_Private) {
+						echo '<i class="icon-lock cadenas"></i>';				
+						}
+					?>
+					<br /><span class="shortname"><?php echo $shortname ?></span></a><br />
+
+
+
+					<div class="btn-group">
+						<a href="#" data-toggle="dropdown" class="btn btn-small btn-info dropdown-toggle options">Options <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="/download/<? echo $file->id();?>" data-backdrop="static"><i class="icon-download"></i> Télécharger</a></li>
+					   	<li><a href="#" onclick="permission('<?php echo $file->id(); ?>', '<?php echo $file->name(); ?>', '<?php echo $mode; ?>')" data-controls-modal="partagerfichier" data-backdrop="static"><i class="icon-share-alt"></i> Partager</a></li>					
+					   	<li><a href="#" onclick="qrcode('<?php echo $file->id(); ?>', '<?php echo $file->name(); ?>')" data-controls-modal="qrcodefichier" data-backdrop="static"><i class="icon-qrcode"></i> Lien de téléchargement</a></li>
+					   	<li><a href="#" onclick="renommer('<?php echo $file->id(); ?>', '<?php echo $file->name(); ?>')" data-controls-modal="renommerfichier" data-backdrop="static"><i class="icon-pencil"></i> Renommer</a></li>
+					   	<li><a href="#" onclick="deplacer('<?php echo $file->id(); ?>', '<?php echo $file->name(); ?>')" data-controls-modal="deplacerfichier" data-backdrop="static"><i class="icon-move"></i> Déplacer ...</a></li>
+					   	<li class="divider"></li>
+					  		<li><a href="#" onclick="supprimer('<?php echo $file->id(); ?>', '<?php echo $file->name(); ?>')" data-controls-modal="supprimerfichier" data-backdrop="static"><i class="icon-remove"></i> Supprimer</a></li>
+						</ul>
+					</div>
+			</div>
+		<?php $count ++;
+		}
+		require $modal_pictureFile; 
+		require $modal_shareFile;
+		require $modal_renameFile;
+		require $modal_removeFile;
+		require $modal_qrFile;
+		require $modal_moveFile;
+	?>
+	</div>
+	
+	<script>
+			var bardiv = document.getElementById('bardiv');
+			var formfile = document.getElementById('formfile');
+			var span_right = document.getElementById('span_right');
+			var submit_ie = document.getElementById('submit_ie');
+			var filedrag = document.getElementById('filedrag');
+			
+			if(navigator.appName == "Microsoft Internet Explorer")
+				{
+					bardiv.style.display = 'none';
+					span_right.style.display = 'none';
+					submit_ie.style.display = 'block';
+					filedrag.style.display = 'none';
+					
+					formfile.setAttribute('action', '/upload');
+					formfile.setAttribute('method', 'POST');
+					formfile.setAttribute('enctype', 'multipart/form-data');
+				}
+</script>
+<script type="text/javascript" >
+	Init();
+	
+	function renommerdossier(id, nom) {
+		document.getElementById("folderid").value=id;
+		document.getElementById("foldernewname").value=nom;
+	}
+
+	function partagerdossier(id, nom, permission) {
+		document.getElementById("folderid2").value=id;
+		document.getElementById("foldername2").innerHTML=nom;
+		document.getElementById("perm").value=permission;
+	}
+		
+	function supprimerdossier(id, nom) {
+		document.getElementById("foldertoremove").value=id;
+		document.getElementById("foldername").innerHTML=nom;	
+	}
+	
+	function permission(id, nom, perm) {
+		document.getElementById("file").value=id;
+		document.getElementById("nom").innerHTML=nom;
+		document.getElementById("permission").value=perm;
+		
+	}
+	
+	function renommer(id, nom) {
+		document.getElementById("filetorename").value=id;
+		document.getElementById("newname").value=nom;	
+	}
+	
+	function supprimer(id, nom) {
+		document.getElementById("filetoremove").value=id;
+		document.getElementById("rname").innerHTML=nom;
+	}
+	
+	function qrcode(id, nom) {
+		document.getElementById("qrname").innerHTML=nom;
+		document.getElementById("imageqrcode").src='/qrcode/'+id;
+		document.getElementById("lien").value='http://sharea.net/download/'+id;
+	}
+	
+	function deplacer(id, nom) {
+		document.getElementById("filetomove").value=id;
+		document.getElementById("mfile").innerHTML=nom;	
+	}
+	
+</script>
+<script type="text/javascript" src="/js/drag.js"></script>
+
+        <div id="pub">
+                <script type="text/javascript">
+                google_ad_client = "ca-pub-4983973769928411";
+                /* DisplayFolder */
+                google_ad_slot = "4830354866";
+                google_ad_width = 234;
+                google_ad_height = 60;
+                </script>
+                <script type="text/javascript"
+                src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+                </script>
+        </div>
+

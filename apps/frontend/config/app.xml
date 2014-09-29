@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<definitions>
+	<!-- Folders -->
+	<define var="folder_redirection_addFolder" value="executeCreate"/>
+	<define var="folder_redirection_renameFolder" value="executeRenameFolder"/>
+	<define var="folder_redirection_removeFolder" value="executeDeleteFolder"/>
+	<define var="folder_redirection_shareFolder" value="executeShareFolder"/>
+
+	<!-- Files -->
+	<define var="folder_redirection_renameFile" value="executeRenameFile"/>
+	<define var="folder_redirection_removeFile" value="executeRemoveFile"/>
+	<define var="folder_redirection_shareFile" value="executeShareFile"/>
+	<define var="folder_redirection_moveFile" value="executeMoveFile"/>
+	
+	<!-- Upload -->
+	<define var="upload_buffer" value="1024"/>
+	<define var="temp_folder" value="/tmp"/>
+
+	<!-- Facebook -->
+	<define var="app_id" value=""/>
+	<define var="app_secret" value=""/>
+	<define var="callback_url" value=""/>
+</definitions>

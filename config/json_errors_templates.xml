@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<templates>
+	<template name="!Auth" uri="notlogged.txt"/>
+	<template name="!Owner" uri="notowner.txt"/>
+	<template name="IsLogged" uri="logged.txt"/>
+</templates>

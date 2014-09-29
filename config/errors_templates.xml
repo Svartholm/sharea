@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<templates>
+	<template name="!Auth" uri="notlogged.php"/>
+	<template name="!Owner" uri="notowner.php"/>
+	<template name="IsLogged" uri="logged.php"/>
+</templates>
